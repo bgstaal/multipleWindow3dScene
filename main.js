@@ -53,6 +53,8 @@ else
 	function init ()
 	{
 		// add a short timeout because window.offsetX reports wrong values before a short period 
+		initialized = true;
+		
 		setTimeout(() => {
 			setupScene();
 			setupWindowManager();
