@@ -34,7 +34,7 @@ if (new URLSearchParams(window.location.search).get("clear"))
 }
 else
 {	
-	// this code is essential to circumvent that some browser preload the content of some pages before you actually hit the url
+	// this code is essential to circumvent that some browsers preload the content of some pages before you actually hit the url
 	document.addEventListener("visibilitychange", () => 
 	{
 		if (document.visibilityState != 'hidden' && !initialized)
@@ -52,9 +52,9 @@ else
 
 	function init ()
 	{
-		// add a short timeout because window.offsetX reports wrong values before a short period 
 		initialized = true;
-		
+
+		// add a short timeout because window.offsetX reports wrong values before a short period 
 		setTimeout(() => {
 			setupScene();
 			setupWindowManager();
@@ -63,64 +63,6 @@ else
 			render();
 			window.addEventListener('resize', resize);
 		}, 500)	
-	}
-
-	function setupWindowManager ()
-	{
-		windowManager = new WindowManager();
-		windowManager.setWinShapeChangeCallback(updateWindowShape);
-		windowManager.setWinChangeCallback(windowsUpdated);
-
-		// here you can add your custom metadata to each windows instance
-		let metaData = {foo: "bar"};
-
-		// this will init the windowmanager and add this window to the centralised pool of windows
-		windowManager.init(metaData);
-
-		// call update windows initially (it will later be called by the win change callback)
-		windowsUpdated();
-	}
-
-	function windowsUpdated ()
-	{
-		let wins = windowManager.getWindows();
-
-		updateNumberOfCubes();
-	}
-
-	function updateNumberOfCubes ()
-	{
-		let wins = windowManager.getWindows();
-
-		// remove all cubes
-		cubes.forEach((c) => {
-			world.remove(c);
-		})
-
-		cubes = [];
-
-		// add new cubes
-		for (let i = 0; i < wins.length; i++)
-		{
-			let win = wins[i];
-
-			let c = new t.Color();
-			c.setHSL(i * .1, 1.0, .5);
-
-			let s = 100 + i * 50;
-			let cube = new t.Mesh(new t.BoxGeometry(s, s, s), new t.MeshBasicMaterial({color: c , wireframe: true}));
-			cube.position.x = win.shape.x + (win.shape.w * .5);
-			cube.position.y = win.shape.y + (win.shape.h * .5);
-
-			world.add(cube);
-			cubes.push(cube);
-		}
-	}
-
-	function updateWindowShape (easing = true)
-	{
-		sceneOffsetTarget = {x: -window.screenX, y: -window.screenY};
-		if (!easing) sceneOffset = sceneOffsetTarget;
 	}
 
 	function setupScene ()
@@ -145,6 +87,63 @@ else
 		document.body.appendChild( renderer.domElement );
 	}
 
+	function setupWindowManager ()
+	{
+		windowManager = new WindowManager();
+		windowManager.setWinShapeChangeCallback(updateWindowShape);
+		windowManager.setWinChangeCallback(windowsUpdated);
+
+		// here you can add your custom metadata to each windows instance
+		let metaData = {foo: "bar"};
+
+		// this will init the windowmanager and add this window to the centralised pool of windows
+		windowManager.init(metaData);
+
+		// call update windows initially (it will later be called by the win change callback)
+		windowsUpdated();
+	}
+
+	function windowsUpdated ()
+	{
+		updateNumberOfCubes();
+	}
+
+	function updateNumberOfCubes ()
+	{
+		let wins = windowManager.getWindows();
+
+		// remove all cubes
+		cubes.forEach((c) => {
+			world.remove(c);
+		})
+
+		cubes = [];
+
+		// add new cubes based on the current window setup
+		for (let i = 0; i < wins.length; i++)
+		{
+			let win = wins[i];
+
+			let c = new t.Color();
+			c.setHSL(i * .1, 1.0, .5);
+
+			let s = 100 + i * 50;
+			let cube = new t.Mesh(new t.BoxGeometry(s, s, s), new t.MeshBasicMaterial({color: c , wireframe: true}));
+			cube.position.x = win.shape.x + (win.shape.w * .5);
+			cube.position.y = win.shape.y + (win.shape.h * .5);
+
+			world.add(cube);
+			cubes.push(cube);
+		}
+	}
+
+	function updateWindowShape (easing = true)
+	{
+		// storing the actual offset in a proxy that we update against in the render function
+		sceneOffsetTarget = {x: -window.screenX, y: -window.screenY};
+		if (!easing) sceneOffset = sceneOffsetTarget;
+	}
+
 
 	function render ()
 	{
@@ -152,16 +151,20 @@ else
 
 		windowManager.update();
 
+
+		// calculate the new position based on the delta between current offset and new offset times a falloff value (to create the nice smoothing effect)
 		let falloff = .05;
 		sceneOffset.x = sceneOffset.x + ((sceneOffsetTarget.x - sceneOffset.x) * falloff);
 		sceneOffset.y = sceneOffset.y + ((sceneOffsetTarget.y - sceneOffset.y) * falloff);
 
+		// set the world position to the offset
 		world.position.x = sceneOffset.x;
 		world.position.y = sceneOffset.y;
 
 		let wins = windowManager.getWindows();
 
 
+		// loop through all our cubes and update their positions based on current window positions
 		for (let i = 0; i < cubes.length; i++)
 		{
 			let cube = cubes[i];
@@ -181,6 +184,7 @@ else
 	}
 
 
+	// resize the renderer to fit the window size
 	function resize ()
 	{
 		let width = window.innerWidth;
