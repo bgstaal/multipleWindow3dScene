@@ -6,3 +6,6 @@ npm-debug.log
 *.png
 .env
 .DS_Store
+package-lock.json
+.gitignore
+package.json
