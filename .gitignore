@@ -6,3 +6,4 @@ npm-debug.log
 *.png
 .env
 .DS_Store
+.glitch-assets
