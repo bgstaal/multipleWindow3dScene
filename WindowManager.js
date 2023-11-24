@@ -28,7 +28,7 @@ class WindowManager
 			}
 		});
 
-		// event listener for when current window is about to ble closed
+		// event listener for when current window is about to be closed
 		window.addEventListener('beforeunload', function (e) 
 		{
 			let index = that.getWindowIndexFromId(that.#id);
