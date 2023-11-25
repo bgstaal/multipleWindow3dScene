@@ -21,6 +21,13 @@ let internalTime = getTime();
 let windowManager;
 let initialized = false;
 
+// Variables to track mouse interaction for dragging and resizing
+let isDragging = false;
+let isResizing = false;
+let selectedCube = null;
+let initialMousePosition = { x: 0, y: 0 };
+let initialCubePosition = { x: 0, y: 0 };
+
 // get time in seconds since beginning of the day (so that all windows use the same time)
 function getTime ()
 {
@@ -63,6 +70,52 @@ else
 			render();
 			window.addEventListener('resize', resize);
 		}, 500)	
+	}
+
+	// Function to handle mouse down event for window interaction
+	function onMouseDown(event) {
+		event.preventDefault();
+
+		const mouse = {
+			x: (event.clientX / window.innerWidth) * 2 - 1,
+			y: -(event.clientY / window.innerHeight) * 2 + 1,
+		};
+
+		const raycaster = new THREE.Raycaster();
+		raycaster.setFromCamera(mouse, camera);
+
+		const intersects = raycaster.intersectObjects(cubes);
+
+		if (intersects.length > 0) {
+			selectedCube = intersects[0].object;
+			initialMousePosition.x = event.clientX;
+			initialMousePosition.y = event.clientY;
+			initialCubePosition.x = selectedCube.position.x;
+			initialCubePosition.y = selectedCube.position.y;
+
+			isDragging = true;
+		}
+	}
+
+	// Function to handle mouse move event for window interaction
+	function onMouseMove(event) {
+		event.preventDefault();
+
+		if (isDragging && selectedCube) {
+			const deltaX = event.clientX - initialMousePosition.x;
+			const deltaY = event.clientY - initialMousePosition.y;
+
+			selectedCube.position.x = initialCubePosition.x + deltaX * 0.01;
+			selectedCube.position.y = initialCubePosition.y - deltaY * 0.01;
+		}
+	}
+
+	// Function to handle mouse up event for window interaction
+	function onMouseUp(event) {
+		event.preventDefault();
+
+		isDragging = false;
+		selectedCube = null;
 	}
 
 	function setupScene ()
@@ -183,6 +236,10 @@ else
 		requestAnimationFrame(render);
 	}
 
+	// Event listeners for mouse events to enable window interaction
+	renderer.domElement.addEventListener('mousedown', onMouseDown);
+	renderer.domElement.addEventListener('mousemove', onMouseMove);
+	renderer.domElement.addEventListener('mouseup', onMouseUp);
 
 	// resize the renderer to fit the window size
 	function resize ()
