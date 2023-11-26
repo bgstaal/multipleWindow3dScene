@@ -67,7 +67,7 @@ else
 
 	function setupScene ()
 	{
-		camera = new t.OrthographicCamera(0, 0, window.innerWidth, window.innerHeight, -10000, 10000);
+		camera = new t.OrthographicCamera(0, window.innerWidth, 0, window.innerHeight, -10000, 10000);
 		
 		camera.position.z = 2.5;
 		near = camera.position.z - .5;
