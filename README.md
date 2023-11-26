@@ -35,7 +35,7 @@ This project is open-sourced under the MIT License.
 
 ## Acknowledgments
 - The Three.js team for their comprehensive 3D library.
-- @didntdrinkwater for this readme.
+- x.com/didntdrinkwater for this readme.
 
 ## Contact
 For more information and updates, follow [@_nonfigurativ_](https://twitter.com/_nonfigurativ_) on Twitter.
