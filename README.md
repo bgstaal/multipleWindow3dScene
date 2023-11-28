@@ -14,8 +14,22 @@ Clone the repository and open `index.html` in your browser to start exploring th
 ```
 git clone https://github.com/bgstaal/multipleWindow3dScene
 ```
+
+Make sure that you have http-server installed globally.
+```
+$ npm i -g http-server
+```
+
 ## Usage
 The main application logic is contained within `main.js` and `WindowManager.js`. The 3D scene is rendered in `index.html`, which serves as the entry point of the application.
+
+```
+$ cd multipleWindow3dScene
+```
+Run the project using `http-server`.
+```
+$ http-server
+```
 
 ## Structure and Components
 - `index.html`: Entry point that sets up the HTML structure and includes the Three.js library and the main script.
