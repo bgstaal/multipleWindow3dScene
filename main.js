@@ -1,7 +1,5 @@
 import WindowManager from './WindowManager.js'
 
-
-
 const t = THREE;
 let camera, scene, renderer, world;
 let near, far;
@@ -17,7 +15,6 @@ today.setSeconds(0);
 today.setMilliseconds(0);
 today = today.getTime();
 
-let internalTime = getTime();
 let windowManager;
 let initialized = false;
 
@@ -37,14 +34,14 @@ else
 	// this code is essential to circumvent that some browsers preload the content of some pages before you actually hit the url
 	document.addEventListener("visibilitychange", () => 
 	{
-		if (document.visibilityState != 'hidden' && !initialized)
+		if (document.visibilityState !== 'hidden' && !initialized)
 		{
 			init();
 		}
 	});
 
 	window.onload = () => {
-		if (document.visibilityState != 'hidden')
+		if (document.visibilityState !== 'hidden')
 		{
 			init();
 		}
@@ -93,10 +90,10 @@ else
 		windowManager.setWinShapeChangeCallback(updateWindowShape);
 		windowManager.setWinChangeCallback(windowsUpdated);
 
-		// here you can add your custom metadata to each windows instance
+		// here you can add your custom metadata to each window instance
 		let metaData = {foo: "bar"};
 
-		// this will init the windowmanager and add this window to the centralised pool of windows
+		// this will init the windowManager and add this window to the centralised pool of windows
 		windowManager.init(metaData);
 
 		// call update windows initially (it will later be called by the win change callback)
@@ -177,7 +174,7 @@ else
 			cube.position.y = cube.position.y + (posTarget.y - cube.position.y) * falloff;
 			cube.rotation.x = _t * .5;
 			cube.rotation.y = _t * .3;
-		};
+		}
 
 		renderer.render(scene, camera);
 		requestAnimationFrame(render);
