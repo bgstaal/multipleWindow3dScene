@@ -9,6 +9,8 @@ let pixR = window.devicePixelRatio ? window.devicePixelRatio : 1;
 let cubes = [];
 let sceneOffsetTarget = {x: 0, y: 0};
 let sceneOffset = {x: 0, y: 0};
+const springConstant = 0.01;
+const dampingConstant = 0.95;
 
 let today = new Date();
 today.setHours(0);
@@ -132,6 +134,19 @@ else
 			cube.position.x = win.shape.x + (win.shape.w * .5);
 			cube.position.y = win.shape.y + (win.shape.h * .5);
 
+			    // Check if rotation speeds exist in localStorage
+				if (localStorage.getItem(`cube${i}RotationSpeedX`) && localStorage.getItem(`cube${i}RotationSpeedY`)) {
+					cube.rotationSpeedX = parseFloat(localStorage.getItem(`cube${i}RotationSpeedX`));
+					cube.rotationSpeedY = parseFloat(localStorage.getItem(`cube${i}RotationSpeedY`));
+				} else {
+					cube.rotationSpeedX = 0.01 + Math.random() * 0.01; // Initialize rotation speed
+					cube.rotationSpeedY = 0.02 + Math.random() * 0.01; // Initialize rotation speed
+					// Save rotation speeds to localStorage
+					localStorage.setItem(`cube${i}RotationSpeedX`, cube.rotationSpeedX);
+					localStorage.setItem(`cube${i}RotationSpeedY`, cube.rotationSpeedY);
+				}
+			cube.velocity = new THREE.Vector3(0, 0, 0);
+
 			world.add(cube);
 			cubes.push(cube);
 		}
@@ -163,21 +178,32 @@ else
 
 		let wins = windowManager.getWindows();
 
-
 		// loop through all our cubes and update their positions based on current window positions
-		for (let i = 0; i < cubes.length; i++)
-		{
+		for (let i = 0; i < cubes.length; i++) {
 			let cube = cubes[i];
 			let win = wins[i];
-			let _t = t;// + i * .2;
 
 			let posTarget = {x: win.shape.x + (win.shape.w * .5), y: win.shape.y + (win.shape.h * .5)}
 
-			cube.position.x = cube.position.x + (posTarget.x - cube.position.x) * falloff;
-			cube.position.y = cube.position.y + (posTarget.y - cube.position.y) * falloff;
-			cube.rotation.x = _t * .5;
-			cube.rotation.y = _t * .3;
-		};
+			// Calculate the spring force
+			let springForceX = (posTarget.x - cube.position.x) * springConstant;
+			let springForceY = (posTarget.y - cube.position.y) * springConstant;
+
+			// Apply the spring force to the velocity
+			cube.velocity.x += springForceX;
+			cube.velocity.y += springForceY;
+
+			// Apply damping to the velocity
+			cube.velocity.x *= dampingConstant;
+			cube.velocity.y *= dampingConstant;
+
+			// Update the position based on the velocity
+			cube.position.x += cube.velocity.x;
+			cube.position.y += cube.velocity.y;
+
+			cube.rotation.x += cube.rotationSpeedX; // Use the previously initialized speed
+			cube.rotation.y += cube.rotationSpeedY; // Use the previously initialized speed
+		}
 
 		renderer.render(scene, camera);
 		requestAnimationFrame(render);
