@@ -77,7 +77,7 @@ else
 		scene.background = new t.Color(0.0);
 		scene.add( camera );
 
-		renderer = new t.WebGLRenderer({antialias: true, depthBuffer: true});
+		renderer = new t.WebGLRenderer({antialias: true});
 		renderer.setPixelRatio(pixR);
 	    
 	  	world = new t.Object3D();
